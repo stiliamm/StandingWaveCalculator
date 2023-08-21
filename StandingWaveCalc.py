@@ -4,7 +4,6 @@ from tkinter.messagebox import askyesno
 from tkinter import ttk
 from settings.constants import *
 
-
 # ================================================================= USER INTERFACE ========================================================================
 
 root = tk.Tk()
@@ -42,17 +41,16 @@ canvas1.create_window(150, 220, window=button1)
 
 
 def standing_wave():
-
     freq_arr = []
 
     length = entry1.get()
-    height = entry2.get()            # Get User Input
+    height = entry2.get()  # Get User Input
     width = entry3.get()
 
     # Calculate frequencies
     for a, b, c in zip(nx, ny, nz):
-        freq = round(172 * math.sqrt((a/float(length))**2 +
-                     (b/float(width))**2 + (c/float(height))**2))
+        freq = round(172 * math.sqrt((a / float(length)) ** 2 +
+                                     (b / float(width)) ** 2 + (c / float(height)) ** 2))
 
         freq_arr.append(f'({a}-{b}-{c}):  {freq} Hz')
         freq_output = '\n'.join(freq_arr)
@@ -64,11 +62,11 @@ def save():
     text = askyesno('Confirm', 'Do you want to save?')
 
     if text == True:
-    # Save Calculated Data to a txt file
+        # Save Calculated Data to a txt file
         with open('data.txt', 'w') as f:
             for line in standing_wave.data:
                 f.write(line)
-    
+
 
 def results():
     window = tk.Toplevel(root)
