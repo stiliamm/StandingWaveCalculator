@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import askyesno
 
-import settings.constants
+import settings.constants as const
 
 
 class StandingWave:
@@ -11,20 +11,24 @@ class StandingWave:
         self._length = length
         self._height = height
         self._width = width
-        self._freq_arr = []
 
     def calculate_frequencies(self, array_const1, array_const2, array_const3):
-        """ Takes in const triplets and returns a string of the room nodes by frequency"""
-        for a, b, c in zip(array_const1, array_const2, array_const3):
-            freq = round(172 * math.sqrt((a / float(self._length)) ** 2 +
-                                         (b / float(self._width)) ** 2 + (c / float(self._height)) ** 2))
+        """ Takes in const triplet arrays and creates a string of the room nodes by frequency"""
+        length = float(self._length.get())
+        width = float(self._width.get())
+        height = float(self._height.get())
+        freq_arr = []
 
-            self._freq_arr.append(f'({a}-{b}-{c}):  {freq} Hz')
-            return '\n'.join(self._freq_arr)
+        for a, b, c in zip(array_const1, array_const2, array_const3):
+            freq = round(172 * math.sqrt((a / length) ** 2 +
+                                         (b / width) ** 2 + (c / height) ** 2))
+
+            freq_arr.append(f'({a}-{b}-{c}):  {freq} Hz')
+
+        return '\n'.join(freq_arr)
 
     def save(self, output_data: str):
         text = askyesno('Confirm', 'Do you want to save?')
-
         if text:
             with open('data.txt', 'w') as f:
                 for line in output_data:
@@ -45,7 +49,7 @@ class StandingWave:
         result.insert(tk.END, data)
 
         # Button to save the data
-        save_data = tk.Button(window, text='Save', command=self.save)
+        save_data = tk.Button(window, text='Save', command=lambda: self.save(data))
         save_data.pack(side='top', pady=10)
 
         window.mainloop()
@@ -78,17 +82,19 @@ class UserInterface:
         self.canvas1.create_window(150, 152, window=self.entry3)
 
         # Map the Standing Wave Function to a Button which executes
-        self.button1 = tk.Button(text='Calculate', command=lambda: [standing_wave(), results()],
+        self.room = StandingWave(self.entry1, self.entry2, self.entry3)
+        self.button1 = tk.Button(text='Calculate', command=self.calculate_and_display_results,
                                  bg='brown', fg='white', font=('ds-digital', 20, 'bold'))
         self.canvas1.create_window(150, 220, window=self.button1)
+
+    def calculate_and_display_results(self):
+        output_data = self.room.calculate_frequencies(const.nx, const.ny, const.nz)
+        self.room.results(self.root, output_data)
 
 
 def main():
     interface = UserInterface()
-    waves = StandingWave(interface.entry1, interface.entry2, interface.entry3)
-    output = waves.calculate_frequencies(settings.constants.nx, settings.constants.ny, settings.constants.nz)
-    waves.save(output)
-    waves.results(interface.root, output)
+    interface.root.mainloop()
 
 
 if __name__ == "__main__":
